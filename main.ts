@@ -10,6 +10,7 @@ const TASK_REGEX = /\[ \] (.+?)\s+\(@(.+?)\)/;
 export default class MyTelegramReminderPlugin extends Plugin {
 	settings!: MyTelegramReminderSettings;
 	private timer: number | null = null;
+	private sentTasks = new Set<string>();
 
 	async onload() {
 		await this.loadSettings();
@@ -44,20 +45,24 @@ export default class MyTelegramReminderPlugin extends Plugin {
 		console.log("🕓 Сейчас:", now.format("YYYY-MM-DD HH:mm:ss"));
 
 		for (const file of files) {
-			console.log("📄 Читаю файл:", file.path);
+			//console.log("📄 Читаю файл:", file.path);
 			const content = await this.app.vault.read(file);
 			const lines = content.split("\n");
 
 			for (const line of lines) {
-				console.log("📜 Строка:", line);
+				//console.log("📜 Строка:", line);
 				const match = line.match(TASK_REGEX);
 				if (!match) continue;
 
 				const taskText = match[1].trim();
 				const datetimeRaw = match[2].trim();
+				const taskKey = `${file.path}::${line}`;
+
+				if (this.sentTasks.has(taskKey)) continue;
+
 				console.log("✅ Найдена задача:", taskText, "| Время:", datetimeRaw);
 
-				let datetime = window.moment(datetimeRaw, this.settings.dateFormat, true);
+                let datetime = window.moment(datetimeRaw, this.settings.dateFormat, true);
 				if (!datetime.isValid()) {
 					const withDefault = `${datetimeRaw} ${this.settings.defaultTime}`;
 					datetime = window.moment(withDefault, this.settings.dateFormat, true);
@@ -72,6 +77,7 @@ export default class MyTelegramReminderPlugin extends Plugin {
 				if (diffMs <= 1000 && diffMs > -1000) {
 					console.log("📤 Время пришло — отправляем задачу в Telegram:", taskText);
 					await this.sendTelegramNotification(taskText, datetime.format(this.settings.dateFormat));
+					this.sentTasks.add(taskKey);
 				}
 			}
 		}
