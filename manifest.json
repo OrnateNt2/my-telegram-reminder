@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
-}
+	"id": "my-telegram-reminder",
+	"name": "Telegram Reminder",
+	"version": "0.0.1",
+	"minAppVersion": "1.0.0",
+	"description": "Sends Telegram messages at specified times in markdown tasks.",
+	"author": "OrnateNt2",
+	"authorUrl": "https://github.com/OrnateNt2",
+	"main": "main.js"
+  }
+  
